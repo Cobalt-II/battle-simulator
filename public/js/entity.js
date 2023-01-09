@@ -4,8 +4,7 @@ export let entities = [];
 export let battleStarted = 0;
 /* For anyone wondering why ids are implemented in this even though they aren't used, its so that you can use timers like setInterval and stuff. A problem that occurs
 with timers like this is that if you reference the address in an array but its changed from what it was, then it won't affect the entity we want it to affect, so we can 
-run an id check on it to make sure its the right entity we want to edit. Atm that's not used in this but if anyone makes something involving timers like that this will be useful
-for an id check. */
+run an id check on it to make sure its the right entity we want to edit. Atm that's not used in this but if anyone makes something involving timers like that this will be useful for an id check. */
 let id = 0;
 
 function getMovementType(type, target) {
