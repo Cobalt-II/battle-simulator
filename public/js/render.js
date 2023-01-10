@@ -55,7 +55,7 @@ requestAnimationFrame(function draw() {
     ctx.font = `${font.size}px ${font.type}`;
     if(!battleStarted) {
     ctx.fillText(`Type: ${ents[targettype]}`, 0, font.size);
-    ctx.fillText(`Team on left: ${teamsettings[0] === 0 ? 'green' : 'red'}`, 0, 2.1 * font.size);
+    ctx.fillText(`Team on left: ${!teamsettings[0] ? 'green' : 'red'}`, 0, 2.1 * font.size);
     }
     requestAnimationFrame(draw);
 });
