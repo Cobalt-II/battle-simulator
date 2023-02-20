@@ -17,3 +17,6 @@ Added the summoner unit, will summon a base unit every second. Additionally, bec
 2/20/23 (patch): 
 Fixed the summoner unit not spawning entities after a battle pause and continue.
 
+2/20/23 (part 2):
+Added a deletion mechanic. You can delete units when in placement mode by using right mouse button on them.
+
