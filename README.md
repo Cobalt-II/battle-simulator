@@ -12,5 +12,8 @@ In this base version, there are 4 units (base, healer, infect, garg), 1 movement
 ![download](https://user-images.githubusercontent.com/97923189/211421062-736f0d3d-862b-4ecd-a12e-5e8975bcd5b9.png)
 
 2/20/23:
-Added the summoner unit, will summon a base unit every second.
+Added the summoner unit, will summon a base unit every second. Additionally, because of this change, the new summon ability has been added.
+
+2/20/23 (patch): 
+Fixed the summoner unit not spawning entities after a battle pause and continue.
 
