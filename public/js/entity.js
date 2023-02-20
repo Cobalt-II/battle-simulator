@@ -4,6 +4,36 @@ export let entities = [];
 export let battleStarted = 0;
 let id = 0;
 
+function checkEntsPos(x, y) {
+  let results = [];
+  for (let co in entities) {
+    let checkX = 0;
+    let checkY = 0;
+    if (entities[co].x > x) {
+      if (x > entities[co].x - entities[co].size) {
+        checkX = 1;
+      }
+    } else {
+      if (x < entities[co].x + entities[co].size) {
+        checkX = 1;
+      }
+    }
+    if (entities[co].y > y) {
+      if (y > entities[co].y - entities[co].size) {
+        checkY = 1;
+      }
+    } else {
+      if (y < entities[co].y + entities[co].size) {
+        checkY = 1;
+      }
+    }
+    if (checkX && checkY) {
+      results.push(co);
+    }
+  }
+  return results;
+}
+
 function checkIfEntDead(id) {
   for (let count in entities) {
     if (entities[count].id === id) {
@@ -279,15 +309,26 @@ document.addEventListener("keydown", function (event) {
 document.addEventListener("mousedown", function (event) {
   let h = base[`${ents[targettype]}`];
   if (!battleStarted) {
-    pushEnt(
-      event.pageX > window.innerWidth / 2 ? teamsettings[1] : teamsettings[0],
-      ents[targettype],
-      event.pageX,
-      event.pageY,
-      h.size,
-      h.health,
-      h.damage,
-      h.speed
-    );
+    switch (event.which) {
+      case 1:
+        pushEnt(
+          event.pageX > window.innerWidth / 2
+            ? teamsettings[1]
+            : teamsettings[0],
+          ents[targettype],
+          event.pageX,
+          event.pageY,
+          h.size,
+          h.health,
+          h.damage,
+          h.speed
+        );
+        break;
+      case 3:
+        let k = checkEntsPos(event.pageX, event.pageY);
+        for (let count in k) {
+          entities.splice(k[count], 1);
+        }
+    }
   }
 });
