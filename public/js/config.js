@@ -2,6 +2,8 @@
     size: 20,
     type: "Arial"
     };
+
+    export let summonerspawn = 1;
     
     export let healercircle = {
     hp: 0.75,
@@ -33,6 +35,12 @@
     damage: 1.5,
     speed: 0.25
     },
+    summoner:  {
+    size: 10,
+    health: 100,
+    damage: 1,
+    speed: 1
+    },
     };
     
-    export let ents = ['healer', 'base', 'infect', 'garg'];
+    export let ents = ['healer', 'base', 'infect', 'garg', 'summoner'];
