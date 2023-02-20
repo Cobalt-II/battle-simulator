@@ -157,7 +157,7 @@ class ent {
   }
 }
 
-export function pushEnt(team, type, x, y, size, health, damage, speed) {
+function pushEnt(team, type, x, y, size, health, damage, speed) {
   entities.push(new ent(team, type, x, y, size, health, damage, speed, id));
   id++;
 }
