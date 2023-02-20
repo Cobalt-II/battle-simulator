@@ -110,27 +110,29 @@ function getAbility(type, address) {
         if (battleStarted) {
           let num;
           let num2;
-          if (!checkIfEntDead(o) && !checkIfTeamDead(Number(!j))) {
-            if (Math.random() < 0.5) {
-              num = -0.1;
-            } else {
-              num = 0.1;
+          if (!checkIfEntDead(o)) {
+            if (!checkIfTeamDead(Number(!j))) {
+              if (Math.random() < 0.5) {
+                num = -0.1;
+              } else {
+                num = 0.1;
+              }
+              if (Math.random() < 0.5) {
+                num2 = -0.1;
+              } else {
+                num2 = 0.1;
+              }
+              pushEnt(
+                entities[address].team,
+                "base",
+                entities[address].x + num,
+                entities[address].y + num2,
+                h.size,
+                h.health,
+                h.damage,
+                h.speed
+              );
             }
-            if (Math.random() < 0.5) {
-              num2 = -0.1;
-            } else {
-              num2 = 0.1;
-            }
-            pushEnt(
-              entities[address].team,
-              "base",
-              entities[address].x + num,
-              entities[address].y + num2,
-              h.size,
-              h.health,
-              h.damage,
-              h.speed
-            );
           } else {
             clearInterval(k);
           }
