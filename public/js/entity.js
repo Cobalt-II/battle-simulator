@@ -201,83 +201,83 @@ function collision(x1, x2, y1, y2, r1, r2) {
 }
 
 requestAnimationFrame(function physics() {
-  if (battleStarted) {
-    for (let count in entities) {
-      if (entities[count].x - entities[count].size < 0) {
-        entities[count].x += Math.abs(entities[count].x);
-      }
-      if (entities[count].x + entities[count].size > window.innerWidth) {
-        entities[count].x -= Math.abs(entities[count].x - window.innerWidth);
-      }
-      if (entities[count].y + entities[count].size > window.innerHeight) {
-        entities[count].y -= Math.abs(entities[count].y - window.innerHeight);
-      }
-      if (entities[count].y - entities[count].size < 0) {
-        entities[count].y += Math.abs(entities[count].y);
-      }
-      for (let coun in entities) {
-        if (
-          count !== coun &&
-          collision(
-            entities[count].x,
-            entities[coun].x,
-            entities[count].y,
-            entities[coun].y,
-            entities[count].size,
-            entities[coun].size
-          ) !== "none"
-        ) {
-          let angle = Math.abs(
-            Math.atan2(
-              entities[count].y - entities[coun].y,
-              entities[count].x - entities[coun].x
-            )
-          );
-          if (entities[count].x < entities[coun].x) {
-            entities[count].x -= Math.cos(angle) * entities[count].speed;
-            entities[coun].x += Math.cos(angle) * entities[coun].speed;
-          } else {
-            entities[count].x += Math.cos(angle) * entities[count].speed;
-            entities[coun].x -= Math.cos(angle) * entities[coun].speed;
-          }
-          if (entities[count].y < entities[coun].y) {
-            entities[count].y -= Math.sin(angle) * entities[count].speed;
-            entities[coun].y += Math.sin(angle) * entities[coun].speed;
-          } else {
-            entities[count].y += Math.sin(angle) * entities[count].speed;
-            entities[coun].y -= Math.sin(angle) * entities[coun].speed;
-          }
-          if (entities[count].team !== entities[coun].team) {
-            entities[count].health -= entities[coun].damage;
-            entities[coun].health -= entities[count].damage;
-            entities[count].lastHit = entities[coun].type;
-            entities[coun].lastHit = entities[count].type;
-          }
-        }
-      }
-      if (entities[count].health <= 0) {
-        getDeathAction(entities[count].lastHit, count);
-      }
-      if (entities[count]) {
-        switch (entities[count].type) {
-          case "healer":
-            getMovementType("norm", entities[count]);
-            getAbility("heal", count);
-            break;
-          default:
-            getMovementType("norm", entities[count]);
-            break;
-          case "summoner":
-            getMovementType("norm", entities[count]);
-            if (!entities[count].initiate) {
-              getAbility("summon", count);
-              entities[count].initiate = 1;
+    if (battleStarted) {
+        for (let count in entities) {
+            if (entities[count].x - entities[count].size < 0) {
+                entities[count].x += Math.abs(entities[count].x);
             }
+            if (entities[count].x + entities[count].size > window.innerWidth) {
+                entities[count].x -= Math.abs(entities[count].x - window.innerWidth);
+            }
+            if (entities[count].y + entities[count].size > window.innerHeight) {
+                entities[count].y -= Math.abs(entities[count].y - window.innerHeight);
+            }
+            if (entities[count].y - entities[count].size < 0) {
+                entities[count].y += Math.abs(entities[count].y);
+            }
+            for (let coun in entities) {
+                if (
+                    count !== coun &&
+                    collision(
+                        entities[count].x,
+                        entities[coun].x,
+                        entities[count].y,
+                        entities[coun].y,
+                        entities[count].size,
+                        entities[coun].size
+                    ) !== "none"
+                ) {
+                    let angle = Math.abs(
+                        Math.atan2(
+                            entities[count].y - entities[coun].y,
+                            entities[count].x - entities[coun].x
+                        )
+                    );
+                    if (entities[count].x < entities[coun].x) {
+                        entities[count].x -= Math.cos(angle) * entities[count].speed;
+                        entities[coun].x += Math.cos(angle) * entities[coun].speed;
+                    } else {
+                        entities[count].x += Math.cos(angle) * entities[count].speed;
+                        entities[coun].x -= Math.cos(angle) * entities[coun].speed;
+                    }
+                    if (entities[count].y < entities[coun].y) {
+                        entities[count].y -= Math.sin(angle) * entities[count].speed;
+                        entities[coun].y += Math.sin(angle) * entities[coun].speed;
+                    } else {
+                        entities[count].y += Math.sin(angle) * entities[count].speed;
+                        entities[coun].y -= Math.sin(angle) * entities[coun].speed;
+                    }
+                    if (entities[count].team !== entities[coun].team) {
+                        entities[count].health -= entities[coun].damage;
+                        entities[coun].health -= entities[count].damage;
+                        entities[count].lastHit = entities[coun].type;
+                        entities[coun].lastHit = entities[count].type;
+                    }
+                }
+            }
+            if (entities[count].health <= 0) {
+                getDeathAction(entities[count].lastHit, count);
+            }
+            if (entities[count]) {
+                switch (entities[count].type) {
+                    case "healer":
+                        getMovementType("norm", entities[count]);
+                        getAbility("heal", count);
+                        break;
+                    default:
+                        getMovementType("norm", entities[count]);
+                        break;
+                    case "summoner":
+                        getMovementType("norm", entities[count]);
+                        if (!entities[count].initiate) {
+                            getAbility("summon", count);
+                        }
+                }
+            }
+            entities[count].initiate = 1;
         }
-      }
     }
-  }
-  requestAnimationFrame(physics);
+    requestAnimationFrame(physics);
 });
 
 export let targettype = 0;
