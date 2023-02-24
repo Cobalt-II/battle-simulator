@@ -273,8 +273,8 @@ requestAnimationFrame(function physics() {
                             getAbility("summon", count);
                         }
                 }
-            }
             entities[count].initiate = 1;
+            }
         }
     }
     requestAnimationFrame(physics);
