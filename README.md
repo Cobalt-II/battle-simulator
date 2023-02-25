@@ -20,3 +20,6 @@ Fixed the summoner unit not spawning entities after a battle pause and continue.
 2/20/23 (part 2):
 Added a deletion mechanic. You can delete units when in placement mode by using right mouse button on them.
 
+2/25/23:
+Completely reworked interval mechanics (got rid of ids, etc. as not needed anymore). Fixed the summoner unit passing its ability off.
+
