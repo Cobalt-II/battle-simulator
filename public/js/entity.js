@@ -119,8 +119,8 @@ function getAbility(type, address) {
         pushEnt(
           entities[address].team,
           "base",
-          entities[address].x + Math.random(),
-          entities[address].y + Math.random(),
+          entities[address].x + 0.1,
+          entities[address].y + 0.1,
           h.size,
           h.health,
           h.damage,
