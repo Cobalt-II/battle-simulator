@@ -2,7 +2,6 @@ import { healercircle, base, ents, summonerspawn } from "/js/config.js";
 
 export let entities = [];
 export let battleStarted = 0;
-let id = 0;
 
 function checkEntsPos(x, y) {
   let results = [];
@@ -32,24 +31,6 @@ function checkEntsPos(x, y) {
     }
   }
   return results;
-}
-
-function checkIfEntDead(id) {
-  for (let count in entities) {
-    if (entities[count].id === id) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function checkIfTeamDead(team) {
-  for (let count in entities) {
-    if (entities[count].team === team) {
-      return false;
-    }
-  }
-  return true;
 }
 
 function getMovementType(type, target) {
@@ -108,7 +89,7 @@ function getDeathAction(type, address) {
         entities[address].maxhealth,
         entities[address].damage,
         entities[address].speed,
-        entities[address].id
+        entities[address].date
       );
       break;
     default:
@@ -134,46 +115,25 @@ function getAbility(type, address) {
       break;
     case "summon":
       let h = base.base;
-      let o = entities[address].id;
-      let j = entities[address].team;
-      let k = setInterval(() => {
-        if (battleStarted) {
-          let num;
-          let num2;
-          if (!checkIfEntDead(o)) {
-            if (!checkIfTeamDead(Number(!j))) {
-              if (Math.random() < 0.5) {
-                num = -0.1;
-              } else {
-                num = 0.1;
-              }
-              if (Math.random() < 0.5) {
-                num2 = -0.1;
-              } else {
-                num2 = 0.1;
-              }
-              pushEnt(
-                entities[address].team,
-                "base",
-                entities[address].x + num,
-                entities[address].y + num2,
-                h.size,
-                h.health,
-                h.damage,
-                h.speed
-              );
-            }
-          } else {
-            clearInterval(k);
-          }
-        }
-      }, summonerspawn * 1000);
+      if (Date.now() - entities[address].date > summonerspawn * 1000) {
+        pushEnt(
+          entities[address].team,
+          "base",
+          entities[address].x,
+          entities[address].y,
+          h.size,
+          h.health,
+          h.damage,
+          h.speed
+        );
+        entities[address].date = Date.now();
+      }
       break;
   }
 }
 
 class ent {
-  constructor(team, type, x, y, size, health, damage, speed, id) {
+  constructor(team, type, x, y, size, health, damage, speed) {
     this.team = team;
     this.type = type;
     this.x = x;
@@ -183,13 +143,12 @@ class ent {
     this.damage = damage;
     this.speed = speed;
     this.maxhealth = health;
-    this.id = id;
+    this.date = Date.now();
   }
 }
 
 function pushEnt(team, type, x, y, size, health, damage, speed) {
-  entities.push(new ent(team, type, x, y, size, health, damage, speed, id));
-  id++;
+  entities.push(new ent(team, type, x, y, size, health, damage, speed));
 }
 
 function collision(x1, x2, y1, y2, r1, r2) {
@@ -201,83 +160,80 @@ function collision(x1, x2, y1, y2, r1, r2) {
 }
 
 requestAnimationFrame(function physics() {
-    if (battleStarted) {
-        for (let count in entities) {
-            if (entities[count].x - entities[count].size < 0) {
-                entities[count].x += Math.abs(entities[count].x);
-            }
-            if (entities[count].x + entities[count].size > window.innerWidth) {
-                entities[count].x -= Math.abs(entities[count].x - window.innerWidth);
-            }
-            if (entities[count].y + entities[count].size > window.innerHeight) {
-                entities[count].y -= Math.abs(entities[count].y - window.innerHeight);
-            }
-            if (entities[count].y - entities[count].size < 0) {
-                entities[count].y += Math.abs(entities[count].y);
-            }
-            for (let coun in entities) {
-                if (
-                    count !== coun &&
-                    collision(
-                        entities[count].x,
-                        entities[coun].x,
-                        entities[count].y,
-                        entities[coun].y,
-                        entities[count].size,
-                        entities[coun].size
-                    ) !== "none"
-                ) {
-                    let angle = Math.abs(
-                        Math.atan2(
-                            entities[count].y - entities[coun].y,
-                            entities[count].x - entities[coun].x
-                        )
-                    );
-                    if (entities[count].x < entities[coun].x) {
-                        entities[count].x -= Math.cos(angle) * entities[count].speed;
-                        entities[coun].x += Math.cos(angle) * entities[coun].speed;
-                    } else {
-                        entities[count].x += Math.cos(angle) * entities[count].speed;
-                        entities[coun].x -= Math.cos(angle) * entities[coun].speed;
-                    }
-                    if (entities[count].y < entities[coun].y) {
-                        entities[count].y -= Math.sin(angle) * entities[count].speed;
-                        entities[coun].y += Math.sin(angle) * entities[coun].speed;
-                    } else {
-                        entities[count].y += Math.sin(angle) * entities[count].speed;
-                        entities[coun].y -= Math.sin(angle) * entities[coun].speed;
-                    }
-                    if (entities[count].team !== entities[coun].team) {
-                        entities[count].health -= entities[coun].damage;
-                        entities[coun].health -= entities[count].damage;
-                        entities[count].lastHit = entities[coun].type;
-                        entities[coun].lastHit = entities[count].type;
-                    }
-                }
-            }
-            if (entities[count].health <= 0) {
-                getDeathAction(entities[count].lastHit, count);
-            }
-            if (entities[count]) {
-                switch (entities[count].type) {
-                    case "healer":
-                        getMovementType("norm", entities[count]);
-                        getAbility("heal", count);
-                        break;
-                    default:
-                        getMovementType("norm", entities[count]);
-                        break;
-                    case "summoner":
-                        getMovementType("norm", entities[count]);
-                        if (!entities[count].initiate) {
-                            getAbility("summon", count);
-                        }
-                }
-            entities[count].initiate = 1;
-            }
+  if (battleStarted) {
+    for (let count in entities) {
+      if (entities[count].x - entities[count].size < 0) {
+        entities[count].x += Math.abs(entities[count].x);
+      }
+      if (entities[count].x + entities[count].size > window.innerWidth) {
+        entities[count].x -= Math.abs(entities[count].x - window.innerWidth);
+      }
+      if (entities[count].y + entities[count].size > window.innerHeight) {
+        entities[count].y -= Math.abs(entities[count].y - window.innerHeight);
+      }
+      if (entities[count].y - entities[count].size < 0) {
+        entities[count].y += Math.abs(entities[count].y);
+      }
+      for (let coun in entities) {
+        if (
+          count !== coun &&
+          collision(
+            entities[count].x,
+            entities[coun].x,
+            entities[count].y,
+            entities[coun].y,
+            entities[count].size,
+            entities[coun].size
+          ) !== "none"
+        ) {
+          let angle = Math.abs(
+            Math.atan2(
+              entities[count].y - entities[coun].y,
+              entities[count].x - entities[coun].x
+            )
+          );
+          if (entities[count].x < entities[coun].x) {
+            entities[count].x -= Math.cos(angle) * entities[count].speed;
+            entities[coun].x += Math.cos(angle) * entities[coun].speed;
+          } else {
+            entities[count].x += Math.cos(angle) * entities[count].speed;
+            entities[coun].x -= Math.cos(angle) * entities[coun].speed;
+          }
+          if (entities[count].y < entities[coun].y) {
+            entities[count].y -= Math.sin(angle) * entities[count].speed;
+            entities[coun].y += Math.sin(angle) * entities[coun].speed;
+          } else {
+            entities[count].y += Math.sin(angle) * entities[count].speed;
+            entities[coun].y -= Math.sin(angle) * entities[coun].speed;
+          }
+          if (entities[count].team !== entities[coun].team) {
+            entities[count].health -= entities[coun].damage;
+            entities[coun].health -= entities[count].damage;
+            entities[count].lastHit = entities[coun].type;
+            entities[coun].lastHit = entities[count].type;
+          }
         }
+      }
+      if (entities[count].health <= 0) {
+        getDeathAction(entities[count].lastHit, count);
+      }
+      if (entities[count]) {
+        switch (entities[count].type) {
+          case "healer":
+            getMovementType("norm", entities[count]);
+            getAbility("heal", count);
+            break;
+          default:
+            getMovementType("norm", entities[count]);
+            break;
+          case "summoner":
+            getMovementType("norm", entities[count]);
+            getAbility("summon", count);
+        }
+      }
     }
-    requestAnimationFrame(physics);
+  }
+  requestAnimationFrame(physics);
 });
 
 export let targettype = 0;
@@ -332,3 +288,4 @@ document.addEventListener("mousedown", function (event) {
     }
   }
 });
+
