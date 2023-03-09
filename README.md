@@ -23,3 +23,6 @@ Added a deletion mechanic. You can delete units when in placement mode by using 
 2/25/23:
 Completely reworked interval mechanics (got rid of ids, etc. as not needed anymore). Fixed the summoner unit passing its ability off.
 
+3/8/23: 
+Reworked the movement mechanics so that it's easier to make new ones. You can now acquire entities and their distances from a certain entity by using the getEnts() function, making custom verisons of this easier to work with for movement.
+
