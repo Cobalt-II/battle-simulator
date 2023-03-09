@@ -3,6 +3,23 @@ import { healercircle, base, ents, summonerspawn } from "/js/config.js";
 export let entities = [];
 export let battleStarted = 0;
 
+function getEnts(target) {
+  let targets = [];
+  for (let coun in entities) {
+    if (entities[coun].team !== target.team) {
+      let k = Math.hypot(
+        entities[coun].x - target.x,
+        entities[coun].y - target.y
+      );
+      targets.push([
+        [entities[coun].x, entities[coun].y, entities[coun].size],
+        k,
+      ]);
+    }
+  }
+  return targets;
+}
+
 function checkEntsPos(x, y) {
   let results = [];
   for (let co in entities) {
@@ -36,19 +53,7 @@ function checkEntsPos(x, y) {
 function getMovementType(type, target) {
   switch (type) {
     case "norm":
-      let targets = [];
-      for (let coun in entities) {
-        if (entities[coun].team !== target.team) {
-          let k = Math.hypot(
-            entities[coun].x - target.x,
-            entities[coun].y - target.y
-          );
-          targets.push([
-            [entities[coun].x, entities[coun].y, entities[coun].size],
-            k,
-          ]);
-        }
-      }
+      let targets = getEnts(target);
       if (targets.length) {
         let targ = Infinity;
         let choice = 0;
