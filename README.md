@@ -26,3 +26,6 @@ Completely reworked interval mechanics (got rid of ids, etc. as not needed anymo
 3/8/23: 
 Reworked the movement mechanics so that it's easier to make new ones. You can now acquire entities and their distances from a certain entity by using the getEnts() function, making custom verisons of this easier to work with for movement.
 
+4/1/23:
+Huge update. Added more functions for easier use. New unit called Ranger that shoots projectiles at enemies. Two new abilities: shoot (ranger shoot ability) and timedLife (bullets die after x amount of time). 2 new movement types: angle (for bullets moving at a specific angle), and ranger (rangers will back up at a certain amount of range away from their target). Healers now move towards their own teammates. 
+
