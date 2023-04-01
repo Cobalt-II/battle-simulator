@@ -1,12 +1,13 @@
-import { healercircle, base, ents, summonerspawn } from "/js/config.js";
+import { healercircle, base, ents, summonerspawn, reloads, bulletLife, rangerdist } from "/js/config.js";
 
 export let entities = [];
 export let battleStarted = 0;
+let id = 0;
 
-function getEnts(target) {
+function getEnts(target, teamType) {
   let targets = [];
   for (let coun in entities) {
-    if (entities[coun].team !== target.team) {
+    if (entities[coun].team == teamType && !entities[coun].type.startsWith('bullet') && entities[coun].id !== target.id) {
       let k = Math.hypot(
         entities[coun].x - target.x,
         entities[coun].y - target.y
@@ -18,7 +19,24 @@ function getEnts(target) {
     }
   }
   return targets;
-}
+};
+
+function filter (targets) {
+  let targ = Infinity;
+  let choice;
+  for (let c in targets) {
+    if (targets[c][1] < targ) {
+      targ = targets[c][1];
+      choice = targets[c][0];
+    }
+  }
+  return choice;
+};
+
+function slope (x, x1, y1) {
+let differ = Math.atan2(y1 - x.y, x1 - x.x);
+return [Math.cos(differ), Math.sin(differ)];
+};
 
 function checkEntsPos(x, y) {
   let results = [];
@@ -48,21 +66,15 @@ function checkEntsPos(x, y) {
     }
   }
   return results;
-}
+};
 
 function getMovementType(type, target) {
   switch (type) {
     case "norm":
-      let targets = getEnts(target);
+      let targets;
+      !target.type.startsWith('healer') ? targets = getEnts(target, !target.team) : targets = getEnts(target, target.team); 
       if (targets.length) {
-        let targ = Infinity;
-        let choice = 0;
-        for (let c in targets) {
-          if (targets[c][1] < targ) {
-            targ = targets[c][1];
-            choice = targets[c][0];
-          }
-        }
+        let choice = filter(targets);
         if (choice) {
           if (target.x > choice[0] + choice[2]) {
             target.x -= target.speed;
@@ -79,12 +91,50 @@ function getMovementType(type, target) {
         }
       }
       break;
+      case "angle":
+      target.x+=target.angle[0] * target.speed;
+      target.y+=target.angle[1] * target.speed;
+      break;
+      case "ranger":
+      let targeter = getEnts(target, !target.team);
+      if (targeter.length) {
+        let choice = filter(targeter);
+        if (Math.hypot(target.x - choice[0], target.y - choice[1]) > rangerdist) {
+          if (target.x > choice[0] + choice[2]) {
+            target.x -= target.speed;
+          }
+          if (target.x < choice[0] - choice[2]) {
+            target.x += target.speed;
+          }
+          if (target.y > choice[1] + choice[2]) {
+            target.y -= target.speed;
+          }
+          if (target.y < choice[1] - choice[2]) {
+            target.y += target.speed;
+          }
+        } else {
+          if (target.x > choice[0] + choice[2]) {
+            target.x += target.speed;
+          }
+          if (target.x < choice[0] - choice[2]) {
+            target.x -= target.speed;
+          }
+          if (target.y > choice[1] + choice[2]) {
+            target.y += target.speed;
+          }
+          if (target.y < choice[1] - choice[2]) {
+            target.y -= target.speed;
+          }
+        }
+      }
+      break;
   }
 }
 
 function getDeathAction(type, address) {
   switch (type) {
     case "infect":
+      if (!entities[address].type.startsWith('bullet')) {
       entities[address] = new ent(
         Number(!entities[address].team),
         "infect",
@@ -96,6 +146,7 @@ function getDeathAction(type, address) {
         entities[address].speed,
         entities[address].date
       );
+      }
       break;
     default:
       entities.splice(address, 1);
@@ -120,7 +171,7 @@ function getAbility(type, address) {
       break;
     case "summon":
       let h = base.base;
-      if (Date.now() - entities[address].date > summonerspawn * 1000) {
+      if (Date.now() - entities[address].date > summonerspawn * 1000 && getEnts(entities[address], !entities[address].team).length) {
         pushEnt(
           entities[address].team,
           "base",
@@ -134,6 +185,28 @@ function getAbility(type, address) {
         entities[address].date = Date.now();
       }
       break;
+      case "shoot":
+      let o = base.bullet;
+      if (Date.now() - entities[address].date > reloads.ranger * 1000 && getEnts(entities[address], !entities[address].team).length) {
+        pushEnt(
+          entities[address].team,
+          "bullet",
+          entities[address].x + 0.1,
+          entities[address].y + 0.1,
+          o.size,
+          o.health,
+          o.damage,
+          o.speed
+        );
+        let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team);
+        let choice = filter(targets);
+        entities[entities.length - 1].angle = slope(entities[entities.length - 1], choice[0], choice[1]);
+        entities[address].date = Date.now();
+      }
+      break;
+      case "timedLife":
+        if (Date.now() - entities[address].date > bulletLife * 1000) {entities.splice(address, 1)}; 
+        break;
   }
 }
 
@@ -149,11 +222,13 @@ class ent {
     this.speed = speed;
     this.maxhealth = health;
     this.date = Date.now();
+    this.id = id;
   }
 }
 
 function pushEnt(team, type, x, y, size, health, damage, speed) {
   entities.push(new ent(team, type, x, y, size, health, damage, speed));
+  id++;
 }
 
 function collision(x1, x2, y1, y2, r1, r2) {
@@ -191,12 +266,13 @@ requestAnimationFrame(function physics() {
             entities[coun].size
           ) !== "none"
         ) {
-          let angle = Math.abs(
-            Math.atan2(
-              entities[count].y - entities[coun].y,
-              entities[count].x - entities[coun].x
-            )
-          );
+          if (!entities[count].type.startsWith('bullet') && !entities[coun].type.startsWith('bullet') || entities[count].team !== entities[coun].team) {
+            let angle = Math.abs(
+              Math.atan2(
+                entities[count].y - entities[coun].y,
+                entities[count].x - entities[coun].x
+              )
+            );
           if (entities[count].x < entities[coun].x) {
             entities[count].x -= Math.cos(angle) * entities[count].speed;
             entities[coun].x += Math.cos(angle) * entities[coun].speed;
@@ -218,6 +294,7 @@ requestAnimationFrame(function physics() {
             entities[coun].lastHit = entities[count].type;
           }
         }
+        }
       }
       if (entities[count].health <= 0) {
         getDeathAction(entities[count].lastHit, count);
@@ -234,6 +311,14 @@ requestAnimationFrame(function physics() {
           case "summoner":
             getMovementType("norm", entities[count]);
             getAbility("summon", count);
+            break;
+          case "ranger":
+              getMovementType("ranger", entities[count]);
+              getAbility("shoot", count);
+              break;
+          case "bullet":
+              getMovementType("angle", entities[count]);
+              getAbility("timedLife", count);
         }
       }
     }
