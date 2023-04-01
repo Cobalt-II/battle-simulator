@@ -1,9 +1,15 @@
-    export let font = {
+export let font = {
     size: 20,
     type: "Arial"
     };
 
     export let summonerspawn = 1;
+    export let bulletLife = 3;
+    export let rangerdist = 500;
+    
+    export let reloads = {
+    ranger: 1,
+    }
     
     export let healercircle = {
     hp: 0.75,
@@ -41,6 +47,18 @@
     damage: 1,
     speed: 1
     },
+    ranger:  {
+    size: 10,
+    health: 100,
+    damage: 1,
+    speed: 0.75
+    },
+    bullet:  {
+    size: 5,
+    health: 10,
+    damage: 3,
+    speed: 5
+    },
     };
     
-    export let ents = ['healer', 'base', 'infect', 'garg', 'summoner'];
+    export let ents = ['healer', 'base', 'infect', 'garg', 'summoner', 'ranger'];
