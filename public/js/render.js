@@ -7,6 +7,7 @@ import {
     battleStarted,
     targettype,
     teamsettings,
+    entCount
 } from "/js/entity.js";
 
 let canvas = document.getElementById("canvas");
@@ -132,6 +133,11 @@ requestAnimationFrame(function draw() {
             `Team on left: ${!teamsettings[0] ? "green" : "red"}`,
             0,
             2.1 * font.size
+        );
+        ctx.fillText(
+            `Green : Red ents: ${entCount[0]} : ${entCount[1]}`,
+            0,
+            3.1 * font.size
         );
     }
     requestAnimationFrame(draw);
