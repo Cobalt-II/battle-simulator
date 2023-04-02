@@ -380,9 +380,11 @@ requestAnimationFrame(function physics() {
             getMovementType("angle", entities[count]);
             getAbility("timedLife", count);
         }
+            if (entities[count]) {
             if (entities[count].health <= 0) {
                 getDeathAction(entities[count].lastHit, count);
             }
+        }
         }
     }
     requestAnimationFrame(physics);
