@@ -3,13 +3,13 @@ export let font = {
     type: "Arial"
     };
 
-    export let summonerspawn = 1;
     export let bulletLife = 3;
     export let rangerdist = 500;
     
     export let reloads = {
-    ranger: 1,
-    }
+    ranger: 60,
+    summoner: 60
+    };
     
     export let healercircle = {
     hp: 0.75,
