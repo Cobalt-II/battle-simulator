@@ -1,13 +1,14 @@
-import { healercircle, base, ents, reloads, bulletLife, rangerdist } from "/js/config.js";
+import { healercircle, base, ents, reloads, bulletLife, rangerdist, bulletptrs, abilitytimers, rolldist } from "/js/config.js";
 
 export let entities = [];
 export let battleStarted = 0;
 let id = 0;
 
-function getEnts(target, teamType) {
+function getEnts(target, teamType, wantBullets) {
     let targets = [];
     for (let coun in entities) {
-        if (entities[coun].team == teamType && !entities[coun].type.startsWith('bullet') && entities[coun].id !== target.id) {
+        if (entities[coun].team == teamType && entities[coun].id !== target.id) {
+            if (wantBullets || !entities[coun].type.startsWith('bullet')) {
             let k = Math.hypot(
                 entities[coun].x - target.x,
                 entities[coun].y - target.y
@@ -17,6 +18,7 @@ function getEnts(target, teamType) {
                 k,
             ]);
         }
+        }
     }
     return targets;
 };
@@ -24,7 +26,6 @@ function getEnts(target, teamType) {
 function filter(targets) {
     let targ = Infinity;
     let choice;
-
     for (let c in targets) {
         if (targets[c][1] < targ) {
             targ = targets[c][1];
@@ -74,19 +75,19 @@ function getMovementType(type, target) {
         case "norm":
             let targets;
             let k = !target.type.startsWith('healer');
-            k ? targets = getEnts(target, !target.team) : targets = getEnts(target, target.team);
+            k ? targets = getEnts(target, !target.team, 0) : targets = getEnts(target, target.team, 0);
             if (targets.length) {
                 let choice;
                 if (k) {
                     choice = filter(targets);
                 } else {
-                    let x = Infinity;
-                    for (let cou in targets) {
-                        if (targets[cou][0].health < x) {
-                            x = targets[cou][0].health;
-                            choice = targets[cou][0];
-                        }
+                    let targ = Infinity;
+                    for (let c in targets) {
+                        if (targets[c][1] < targ && targets[c][0].health / targets[c][0].maxhealth < healercircle.rushto) {
+                        targ = targets[c][1];
+                        choice = targets[c][0];
                     }
+                }
                 }
                 if (choice) {
                     if (target.x > choice.x + choice.size) {
@@ -109,7 +110,7 @@ function getMovementType(type, target) {
             target.y += target.angle[1] * target.speed;
             break;
         case "ranger":
-            let targeter = getEnts(target, !target.team);
+            let targeter = getEnts(target, !target.team, 0);
             if (targeter.length) {
                 let choice = filter(targeter);
                 if (Math.hypot(target.x - choice.x, target.y - choice.y) > rangerdist) {
@@ -202,7 +203,7 @@ function getAbility(type, address) {
             if (!(entities[address].tick % reloads[entities[address].type])) {
                 pushEnt(
                     entities[address].team,
-                    "bullet",
+                    bulletptrs[entities[address].type],
                     entities[address].x + 0.1,
                     entities[address].y + 0.1,
                     o.size,
@@ -210,7 +211,7 @@ function getAbility(type, address) {
                     o.damage,
                     o.speed
                 );
-                let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team);
+                let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team, 0);
                 let choice = filter(targets);
                 if (choice) {
                 entities[entities.length - 1].angle = slope(entities[entities.length - 1], choice.x, choice.y);
@@ -224,6 +225,25 @@ function getAbility(type, address) {
                 entities.splice(address, 1)
             };
             break;
+        case "roll":
+            if (!(entities[address].tick % abilitytimers[entities[address].type])) {
+                let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team, 1);
+                let choice = filter(targets);
+                if (choice) {
+                if (choice.x < entities[address].x) {
+                   entities[address].x-=rolldist;
+                }
+                if (choice.x > entities[address].x) {
+                    entities[address].x+=rolldist;
+                }
+                if (choice.y < entities[address].y) {
+                    entities[address].y-=rolldist;
+                }
+                if (choice.y > entities[address].y) {
+                    entities[address].y+=rolldist;
+                }
+                }
+            }
     }
 }
 
@@ -336,9 +356,14 @@ requestAnimationFrame(function physics() {
                         getMovementType("norm", entities[count]);
                         getAbility("summon", count);
                         break;
-                    case "ranger":
+                    case "ranger": 
                         getMovementType("ranger", entities[count]);
                         getAbility("shoot", count);
+                        break;
+                        case "commando":
+                        getMovementType("norm", entities[count]);
+                        getAbility("shoot", count); 
+                        getAbility("roll", count);
                         break;
                     case "bullet":
                         getMovementType("angle", entities[count]);
