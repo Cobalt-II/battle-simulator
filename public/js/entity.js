@@ -73,22 +73,9 @@ function checkEntsPos(x, y) {
 function getMovementType(type, target) {
     switch (type) {
         case "norm":
-            let targets;
-            let k = !target.type.startsWith('healer');
-            k ? targets = getEnts(target, !target.team, 0) : targets = getEnts(target, target.team, 0);
+            let targets = getEnts(target, !target.team, 0);
             if (targets.length) {
-                let choice;
-                if (k) {
-                    choice = filter(targets);
-                } else {
-                    let targ = Infinity;
-                    for (let c in targets) {
-                        if (targets[c][1] < targ && targets[c][0].health / targets[c][0].maxhealth < healercircle.rushto) {
-                        targ = targets[c][1];
-                        choice = targets[c][0];
-                    }
-                }
-                }
+                let choice = filter(targets);
                 if (choice) {
                     if (target.x > choice.x + choice.size) {
                         target.x -= target.speed;
@@ -142,6 +129,33 @@ function getMovementType(type, target) {
                 }
             }
             break;
+            case "medic":
+               let targe = getEnts(target, target.team, 0);
+               let targ = Infinity;
+               let choice;
+                for (let c in targe) {
+                    if (targe[c][1] < targ && targe[c][0].health / targe[c][0].maxhealth < healercircle.rushto) {
+                    targ = targe[c][1];
+                    choice = targe[c];
+                }
+            }
+            if (choice) {
+                if (Math.hypot(target.x - choice[0].x, target.y - choice[0].y) > healercircle.radius) {
+                if (target.x > choice[0].x + choice[0].size) {
+                    target.x -= target.speed;
+                }
+                if (target.x < choice[0].x - choice[0].size) {
+                    target.x += target.speed;
+                }
+                if (target.y > choice[0].y + choice[0].size) {
+                    target.y -= target.speed;
+                }
+                if (target.y < choice[0].y - choice[0].size) {
+                    target.y += target.speed;
+                }
+            }
+        }
+        break;
     }
 }
 
@@ -346,7 +360,7 @@ requestAnimationFrame(function physics() {
             if (entities[count]) {
                 switch (entities[count].type) {
                     case "healer":
-                        getMovementType("norm", entities[count]);
+                        getMovementType("medic", entities[count]);
                         getAbility("heal", count);
                         break;
                     default:
