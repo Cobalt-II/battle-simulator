@@ -30,5 +30,5 @@ Reworked the movement mechanics so that it's easier to make new ones. You can no
 Huge update. Added more functions for easier use. New unit called Ranger that shoots projectiles at enemies. Two new abilities: shoot (ranger shoot ability) and timedLife (bullets die after x amount of time). 2 new movement types: angle (for bullets moving at a specific angle), and ranger (rangers will back up at a certain amount of range away from their target). Healers now move towards their own teammates. 
 
 4/2/23: 
-Added an entity tick system rather than using Date.now() timing for better sync. Added an entity counter. Rebalanced ranger and its bullet. Added the commando and its "roll" ability.
+Added an entity tick system rather than using Date.now() timing for better sync. Added an entity counter. Rebalanced ranger and its bullet. Added the commando and its "roll" ability. Added the Flamer and it's special flame bullet.
 
