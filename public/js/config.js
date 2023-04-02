@@ -3,7 +3,7 @@ export let font = {
     type: "Arial"
     };
 
-    export let bulletLife = 3;
+    export let bulletLife = 180;
     export let rangerdist = 500;
     
     export let reloads = {
@@ -55,9 +55,9 @@ export let font = {
     },
     bullet:  {
     size: 5,
-    health: 10,
-    damage: 3,
-    speed: 5
+    health: 5,
+    damage: 15,
+    speed: 10
     },
     };
     
