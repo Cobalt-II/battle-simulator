@@ -97,8 +97,11 @@ requestAnimationFrame(function draw() {
             case "ranger":
                 arcer("#4b5320", entities[count]);
                 break;
-                case "commando":
+            case "commando":
                 arcer("#FFFFFF", entities[count]);
+                break;
+            case "flamer":
+                arcer("#fb8b23", entities[count]);
                 break;
         }
         if (entities[count].health / entities[count].maxhealth < 1) {
