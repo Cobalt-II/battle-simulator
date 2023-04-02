@@ -1,4 +1,4 @@
-import { healercircle, base, ents, reloads, bulletLife, rangerdist, bulletptrs, abilitytimers, rolldist } from "/js/config.js";
+import { healercircle, base, ents, reloads, bulletLife, rangerdist, bulletptrs, abilitytimers, rolldist, flamespread } from "/js/config.js";
 
 export let entities = [];
 export let battleStarted = 0;
@@ -213,7 +213,7 @@ function getAbility(type, address) {
             }
             break;
         case "shoot":
-            let o = base.bullet;
+            let o = base[bulletptrs[entities[address].type]];
             if (!(entities[address].tick % reloads[entities[address].type])) {
                 pushEnt(
                     entities[address].team,
@@ -228,7 +228,17 @@ function getAbility(type, address) {
                 let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team, 0);
                 let choice = filter(targets);
                 if (choice) {
+                switch (bulletptrs[entities[address].type]) {
+                default:
                 entities[entities.length - 1].angle = slope(entities[entities.length - 1], choice.x, choice.y);
+                break;
+                case 'bulletflame':
+                let x;
+                Math.random() > 0.5 ? x = Math.random() * -flamespread : x = Math.random() * flamespread;
+                let y;
+                Math.random() > 0.5 ? y = Math.random() * -flamespread : y = Math.random() * flamespread;
+                entities[entities.length - 1].angle = slope(entities[entities.length - 1], choice.x + x, choice.y + y);   
+                }
                 } else {
                 entities.splice(entities.length - 1, 1);
                 }
@@ -374,6 +384,10 @@ requestAnimationFrame(function physics() {
                         getMovementType("norm", entities[count]);
                         getAbility("shoot", count); 
                         getAbility("roll", count);
+                        break;
+                    case "flamer":
+                        getMovementType("norm", entities[count]);
+                        getAbility("shoot", count); 
                         break;
             }
         } else {
