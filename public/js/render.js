@@ -101,6 +101,7 @@ requestAnimationFrame(function draw() {
                 arcer("#FFFFFF", entities[count]);
                 break;
         }
+        if (entities[count].health / entities[count].maxhealth < 1) {
         ctx.fillStyle = "#000000";
         ctx.fillRect(
             entities[count].x - entities[count].size / 2,
@@ -116,6 +117,7 @@ requestAnimationFrame(function draw() {
             entities[count].size,
             5
         );
+        }
     }
 
     ctx.fillStyle = "#000000";
