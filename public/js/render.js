@@ -25,6 +25,37 @@ function update() {
     canvas.height = window.innerHeight;
 }
 
+function arcer (fill, k) {
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.arc(
+        k.x,
+        k.y,
+        k.size / 1.25,
+        0,
+        Math.PI * 2,
+        true
+    );
+    ctx.closePath();
+    ctx.fill();
+};
+
+function cross (fill, k) {
+    ctx.fillStyle = fill;
+    ctx.fillRect(
+        k.x - k.size / 2,
+        k.y - k.size / 4,
+        k.size,
+        k.size / 2
+    );
+    ctx.fillRect(
+        k.x - k.size / 4,
+        k.y - k.size / 2,
+        k.size / 2,
+        k.size
+    );
+}
+
 requestAnimationFrame(function draw() {
     if (
         canvas.width !== window.innerWidth ||
@@ -55,57 +86,19 @@ requestAnimationFrame(function draw() {
         ctx.fill();
         switch (entities[count].type) {
             case "infect":
-                ctx.fillStyle = "#134F13";
-                ctx.fillRect(
-                    entities[count].x - entities[count].size / 2,
-                    entities[count].y - entities[count].size / 4,
-                    entities[count].size,
-                    entities[count].size / 2
-                );
+                cross("#134F13", entities[count]);
                 break;
             case "healer":
-                ctx.fillStyle = "#A50000";
-                ctx.fillRect(
-                    entities[count].x - entities[count].size / 2,
-                    entities[count].y - entities[count].size / 4,
-                    entities[count].size,
-                    entities[count].size / 2
-                );
-                ctx.fillRect(
-                    entities[count].x - entities[count].size / 4,
-                    entities[count].y - entities[count].size / 2,
-                    entities[count].size / 2,
-                    entities[count].size
-                );
+                cross("#A50000", entities[count]);
                 break;
             case "summoner":
-                ctx.fillStyle = "#00EEEE";
-                ctx.fillRect(
-                    entities[count].x - entities[count].size / 2,
-                    entities[count].y - entities[count].size / 4,
-                    entities[count].size,
-                    entities[count].size / 2
-                );
-                ctx.fillRect(
-                    entities[count].x - entities[count].size / 4,
-                    entities[count].y - entities[count].size / 2,
-                    entities[count].size / 2,
-                    entities[count].size
-                );
+                cross("#00EEEE", entities[count]);
                 break;
             case "ranger":
-                ctx.fillStyle = "#4b5320";
-                ctx.beginPath();
-                ctx.arc(
-                    entities[count].x,
-                    entities[count].y,
-                    entities[count].size / 1.25,
-                    0,
-                    Math.PI * 2,
-                    true
-                );
-                ctx.closePath();
-                ctx.fill();
+                arcer("#4b5320", entities[count]);
+                break;
+                case "commando":
+                arcer("#FFFFFF", entities[count]);
                 break;
         }
         ctx.fillStyle = "#000000";
