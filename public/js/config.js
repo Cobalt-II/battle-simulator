@@ -40,7 +40,7 @@ export let font = {
     },
     garg:  {
     size: 30,
-    health: 500,
+    health: 1000,
     damage: 1.5,
     speed: 0.25
     },
