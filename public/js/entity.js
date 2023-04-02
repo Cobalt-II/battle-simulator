@@ -220,7 +220,7 @@ function getAbility(type, address) {
             }
             break;
         case "timedLife":
-            if (Date.now() - entities[address].date > bulletLife * 1000) {
+            if (entities[address].tick > bulletLife) {
                 entities.splice(address, 1)
             };
             break;
@@ -256,7 +256,13 @@ function collision(x1, x2, y1, y2, r1, r2) {
     return collisionn;
 }
 
+export let entCount = [0, 0];
+
 requestAnimationFrame(function physics() {
+    entCount = [0, 0];
+    for (let count in entities) {
+        entities[count].team ? entCount[1]++ : entCount[0]++;
+        }
     if (battleStarted) {
         for (let count in entities) {
             entities[count].tick++;
