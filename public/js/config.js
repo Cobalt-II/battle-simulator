@@ -6,11 +6,13 @@ export let font = {
     export let bulletLife = 180;
     export let rangerdist = 500;
     export let rolldist = 60;
+    export let flamespread = 120;
     
     export let reloads = {
     ranger: 60,
     summoner: 60,
-    commando: 20
+    commando: 20,
+    flamer: 5
     };
     
     export let healercircle = {
@@ -68,15 +70,28 @@ export let font = {
     damage: 15,
     speed: 15
     },
+    flamer:  {
+    size: 10,
+    health: 300,
+    damage: 5,
+    speed: 0.75
+    },
+    bulletflame:  {
+    size: 5,
+    health: 5,
+    damage: 15,
+    speed: 3
+    },
     };
     
     export let bulletptrs = {
     ranger: 'bullet',
-    commando: 'bullet'
+    commando: 'bullet',
+    flamer: 'bulletflame'
     };
 
     export let abilitytimers = {
     commando: 120
     };
     
-    export let ents = ['healer', 'base', 'infect', 'garg', 'summoner', 'ranger', 'commando'];
+    export let ents = ['healer', 'base', 'infect', 'garg', 'summoner', 'ranger', 'commando', 'flamer'];
