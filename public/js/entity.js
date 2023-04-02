@@ -283,11 +283,10 @@ function pushEnt(team, type, x, y, size, health, damage, speed) {
 }
 
 function collision(x1, x2, y1, y2, r1, r2) {
-    let collisionn = "none";
     if (Math.hypot(x1 - x2, y1 - y2) < r1 + r2) {
-        collisionn = "true";
+        return true;
     }
-    return collisionn;
+    return false;
 }
 
 export let entCount = [0, 0];
@@ -322,7 +321,7 @@ requestAnimationFrame(function physics() {
                         entities[coun].y,
                         entities[count].size,
                         entities[coun].size
-                    ) !== "none"
+                    )
                 ) {
                     if (!entities[count].type.startsWith('bullet') && !entities[coun].type.startsWith('bullet') || entities[count].team !== entities[coun].team) {
                         let angle = Math.abs(
@@ -354,10 +353,7 @@ requestAnimationFrame(function physics() {
                     }
                 }
             }
-            if (entities[count].health <= 0) {
-                getDeathAction(entities[count].lastHit, count);
-            }
-            if (entities[count]) {
+            if (!entities[count].type.startsWith('bullet')) {
                 switch (entities[count].type) {
                     case "healer":
                         getMovementType("medic", entities[count]);
@@ -374,15 +370,18 @@ requestAnimationFrame(function physics() {
                         getMovementType("ranger", entities[count]);
                         getAbility("shoot", count);
                         break;
-                        case "commando":
+                    case "commando":
                         getMovementType("norm", entities[count]);
                         getAbility("shoot", count); 
                         getAbility("roll", count);
                         break;
-                    case "bullet":
-                        getMovementType("angle", entities[count]);
-                        getAbility("timedLife", count);
-                }
+            }
+        } else {
+            getMovementType("angle", entities[count]);
+            getAbility("timedLife", count);
+        }
+            if (entities[count].health <= 0) {
+                getDeathAction(entities[count].lastHit, count);
             }
         }
     }
