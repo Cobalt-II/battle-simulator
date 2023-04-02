@@ -1,4 +1,4 @@
-import { healercircle, base, ents, summonerspawn, reloads, bulletLife, rangerdist } from "/js/config.js";
+import { healercircle, base, ents, reloads, bulletLife, rangerdist } from "/js/config.js";
 
 export let entities = [];
 export let battleStarted = 0;
@@ -184,7 +184,7 @@ function getAbility(type, address) {
             break;
         case "summon":
             let h = base.base;
-            if (Date.now() - entities[address].date > summonerspawn * 1000 && getEnts(entities[address], !entities[address].team).length) {
+            if (!(entities[address].tick % reloads[entities[address].type])) {
                 pushEnt(
                     entities[address].team,
                     "base",
@@ -195,12 +195,11 @@ function getAbility(type, address) {
                     h.damage,
                     h.speed
                 );
-                entities[address].date = Date.now();
             }
             break;
         case "shoot":
             let o = base.bullet;
-            if (Date.now() - entities[address].date > reloads.ranger * 1000 && getEnts(entities[address], !entities[address].team).length) {
+            if (!(entities[address].tick % reloads[entities[address].type])) {
                 pushEnt(
                     entities[address].team,
                     "bullet",
@@ -213,8 +212,11 @@ function getAbility(type, address) {
                 );
                 let targets = getEnts(entities[entities.length - 1], !entities[entities.length - 1].team);
                 let choice = filter(targets);
+                if (choice) {
                 entities[entities.length - 1].angle = slope(entities[entities.length - 1], choice.x, choice.y);
-                entities[address].date = Date.now();
+                } else {
+                entities.splice(entities.length - 1, 1);
+                }
             }
             break;
         case "timedLife":
@@ -236,8 +238,8 @@ class ent {
         this.damage = damage;
         this.speed = speed;
         this.maxhealth = health;
-        this.date = Date.now();
         this.id = id;
+        this.tick = 0;
     }
 }
 
@@ -257,6 +259,7 @@ function collision(x1, x2, y1, y2, r1, r2) {
 requestAnimationFrame(function physics() {
     if (battleStarted) {
         for (let count in entities) {
+            entities[count].tick++;
             if (entities[count].x - entities[count].size < 0) {
                 entities[count].x += Math.abs(entities[count].x);
             }
