@@ -340,19 +340,17 @@ requestAnimationFrame(function physics() {
                                 entities[count].x - entities[coun].x
                             )
                         );
+                        let sine = Math.sin(angle);
+                        let cosine = Math.cos(angle);
                         if (entities[count].x < entities[coun].x) {
-                            entities[count].x -= Math.cos(angle) * entities[count].speed;
-                            entities[coun].x += Math.cos(angle) * entities[coun].speed;
+                            entities[count].x += cosine * entities[count].speed;
                         } else {
-                            entities[count].x += Math.cos(angle) * entities[count].speed;
-                            entities[coun].x -= Math.cos(angle) * entities[coun].speed;
+                            entities[count].x += cosine * entities[count].speed;
                         }
                         if (entities[count].y < entities[coun].y) {
-                            entities[count].y -= Math.sin(angle) * entities[count].speed;
-                            entities[coun].y += Math.sin(angle) * entities[coun].speed;
+                            entities[count].y -= sine * entities[count].speed;
                         } else {
-                            entities[count].y += Math.sin(angle) * entities[count].speed;
-                            entities[coun].y -= Math.sin(angle) * entities[coun].speed;
+                            entities[count].y += sine * entities[count].speed;
                         }
                         if (entities[count].team !== entities[coun].team) {
                             entities[count].health -= entities[coun].damage;
